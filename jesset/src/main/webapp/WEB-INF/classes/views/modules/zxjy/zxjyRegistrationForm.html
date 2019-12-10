@@ -1,0 +1,202 @@
+<% layout('/layouts/default.html', {title: '报名登记管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(zxjyRegistration.isNewRecord ? '新增报名登记表' : '编辑报名登记表')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${zxjyRegistration}" action="${ctx}/zxjy/zxjyRegistration/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="id"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('学生')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="queryStudents" blankOption="true" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('科目')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="subjectsId" maxlength="32" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<!--<div class="col-xs-6">-->
+						<!--<div class="form-group">-->
+							<!--<label class="control-label col-sm-4" title="">-->
+								<!--<span class="required ">*</span> ${text('科目')}：<i class="fa icon-question hide"></i></label>-->
+							<!--<div class="col-sm-8">-->
+								<!--<#form:select path="querySubjects" blankOption="true" class="form-control"/>-->
+							<!--</div>-->
+						<!--</div>-->
+					<!--</div>-->
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('教师id')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="teacherId" maxlength="32" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('费用id')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="costId" maxlength="32" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('支付方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="payType" dictType="pay_type" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('课程类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="courseType" dictType="course_type" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('上课时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="subjectsDate" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="datetime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+				</div>
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('备注字段')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:textarea path="remarks" rows="4" maxlength="100" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zxjy:zxjyRegistration:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+$(document).ready(function () {
+    $('#queryStudents').select2({
+        language: "zh-CN",
+        minimumInputLength: 1,
+        placeholder: "-- 请输入学生姓名 --",
+        ajax: {
+            url: "${ctx}/zxjy/zxjyRegistration/studentsAll",
+            dataType: "json",
+            delay: 500,
+            type: "POST",
+            data: function (params) {
+                return {name: params.term};//name为入参标识
+            },
+            processResults: function (res, params) {
+                var options = [];
+                $('#queryStudents').change(function () {
+                    $("#id").val($(this).val());
+                })
+                $(res).each(function (index, r) {
+                    var option = {"id": r.id, "text": r.name};
+                    options.push(option);
+                });
+                return {
+                    results: options
+                };
+            },
+            escapeMarkup: function (m) {
+                return m;
+            }
+        }
+    });
+
+    //
+    // $('#querySubjects').select2({
+    //     language: "zh-CN",
+    //     minimumInputLength: 1,
+    //     placeholder: "-- 请输入科目 --",
+    //     ajax: {
+    //         url: "${ctx}/zxjy/zxjyRegistration/subjectsAll",
+    //         dataType: "json",
+    //         delay: 500,
+    //         type: "POST",
+    //         data: function (params) {
+    //             return {name: params.term};//name为入参标识
+    //         },
+    //         processResults: function (res, params) {
+    //             var options = [];
+    //             $('#querySubjects').change(function () {
+    //                 $("#id").val($(this).val());
+    //             })
+    //             $(res).each(function (index, r) {
+    //                 var option = {"id": r.id, "text": r.name};
+    //                 options.push(option);
+    //             });
+    //             return {
+    //                 results: options
+    //             };
+    //         },
+    //         escapeMarkup: function (m) {
+    //             return m;
+    //         }
+    //     }
+    // });
+});
+
+</script>
